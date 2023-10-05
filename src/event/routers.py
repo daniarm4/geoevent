@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.database import Session
+from src.database import get_session
 from src.auth.models import User
 from src.auth.auth import get_current_user
 from src.event.service import (
@@ -36,7 +36,7 @@ def event_to_dict(event):
 
 
 @router.get("/", response_model=EventList)
-def get_all_events():
+def get_all_events(Session=Depends(get_session)):
     event_list = []
     with Session() as session:
         events = get_events(session)
@@ -46,7 +46,7 @@ def get_all_events():
 
 
 @router.get("/{event_id}", response_model=EventRead)
-def get_event(event_id: int):    
+def get_event(event_id: int, Session=Depends(get_session)):    
     with Session() as session:
         event = get(session, event_id)
     response_event = event_to_dict(event)
@@ -54,7 +54,7 @@ def get_event(event_id: int):
 
 
 @router.get("/by_user/{user_id}", response_model=EventList)
-def get_events_by_user_id(user_id: int):
+def get_events_by_user_id(user_id: int, Session=Depends(get_session)):
     event_list = []
     with Session() as session:
         events = get_events_by_user(session, user_id)
@@ -64,7 +64,11 @@ def get_events_by_user_id(user_id: int):
 
 
 @router.post("/create", response_model=EventRead)
-def create_new_event(event_in: EventCreate, current_user: Annotated[User, Depends(get_current_user)]):
+def create_new_event(
+        event_in: EventCreate, 
+        current_user: Annotated[User, Depends(get_current_user)], 
+        Session=Depends(get_session)
+    ):
     with Session() as session:
         event = create_event(session, event_in, current_user.id)
         session.commit()
@@ -73,28 +77,47 @@ def create_new_event(event_in: EventCreate, current_user: Annotated[User, Depend
 
 
 @router.delete("/{event_id}", response_model=EventRead)
-def delete_event_by_id(event_id: int):
+def delete_event_by_id(
+        event_id: int, 
+        current_user: Annotated[User, Depends(get_current_user)], 
+        Session=Depends(get_session)
+    ):
     with Session() as session:
         event = get(session, event_id)
-        event_response = event_to_dict(event)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={"An event with this id does not exist"}
             )
+        if event.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"You can't delete this event"}
+            )
+        event_response = event_to_dict(event)
         delete_event(session, event)
         session.commit()
     return event_response
 
 
 @router.put("/{event_id}", response_model=EventRead)
-def update_event_by_id(event_id: int, values: EventUpdate):
+def update_event_by_id(
+        event_id: int, 
+        values: EventUpdate, 
+        current_user: Annotated[User, Depends(get_current_user)], 
+        Session=Depends(get_session)
+    ):
     with Session() as session:
         event = get(session, event_id)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={"An event with this id does not exist"}
+            )
+        if event.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"You can't update this event"}
             )
         update_event(session, event_id, values)
         response_event = event_to_dict(event)

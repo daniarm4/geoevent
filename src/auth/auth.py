@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 
 from src import config
-from src.database import Session
+from src.database import get_session
 from src.auth.models import User
 
 JWT_SECRET_KEY = config.JWT_SECRET_KEY
@@ -33,14 +33,17 @@ def get_access_token(data: dict):
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(
+        token: Annotated[str, Depends(oauth2_scheme)], 
+        Session=Depends(get_session)
+    ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try: 
-        payload = jwt.decode(token=token, key=JWT_SECRET_KEY,algorithms=['HS256'])
+        payload = jwt.decode(token=token, key=JWT_SECRET_KEY, algorithms=['HS256'])
         email = payload.get("sub")
         if not email: 
             raise credentials_exception 

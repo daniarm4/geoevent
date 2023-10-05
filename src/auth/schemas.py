@@ -1,21 +1,21 @@
 from typing import List
 
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr, SecretStr, Field
 
 from src.event.schemas import EventRead
 
 
 class UserBase(BaseModel):
-    email: EmailStr
-    username: str 
+    email: EmailStr = Field(max_length=155)
+    username: str = Field(max_length=155)
 
 
 class UserCreate(UserBase):
-    password: constr(min_length=8, max_length=20) 
+    password: SecretStr = Field(min_length=8, max_length=16)
 
 
 class UserIn(UserBase):    
-    password: constr(min_length=8, max_length=20)
+    password: SecretStr = Field(min_length=8, max_length=16)
 
 
 class UserRead(UserBase):
@@ -29,8 +29,7 @@ class UserUpdate(UserBase):
 
 class Token(BaseModel):
     access_token: str 
-    token_type: str 
 
 
 class TokenData(BaseModel):
-    email: str
+    email: EmailStr 

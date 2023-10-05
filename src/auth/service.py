@@ -60,7 +60,7 @@ def create(db_session: Session, user_in: UserCreate) -> User:
     Returns:
         The new User object.
     """
-    hashed_password = get_hashed_password(user_in.password)
+    hashed_password = get_hashed_password(user_in.password.get_secret_value())
     user = User(
         email=user_in.email,
         username=user_in.username,

@@ -1,14 +1,15 @@
 from typing import Optional, List
 from datetime import datetime
+from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class EventBase(BaseModel):
     name: str 
     description: Optional[str] = None
-    longitude: float 
-    latitude: float 
+    longitude: Decimal = Field(max_digits=12, decimal_places=6)
+    latitude: Decimal = Field(max_digits=12, decimal_places=6)
 
 
 class EventCreate(EventBase):
@@ -27,4 +28,4 @@ class EventUpdate(BaseModel):
 
 
 class EventList(BaseModel):
-    events: Optional[List[EventRead]]
+    events: List[EventRead] = []

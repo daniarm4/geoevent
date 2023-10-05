@@ -14,8 +14,8 @@ class Event(Base):
     name: Mapped[str]
     description: Mapped[Optional[str]]
     created_at = mapped_column(DateTime(timezone=True), default=datetime.utcnow(), nullable=False)
-    longitude = mapped_column(Numeric(9, 6), nullable=False) 
-    latitude = mapped_column(Numeric(8, 6), nullable=False)
+    longitude = mapped_column(Numeric(12, 6), nullable=False) 
+    latitude = mapped_column(Numeric(12, 6), nullable=False)
 
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
     user: Mapped["User"] = relationship(back_populates='events')

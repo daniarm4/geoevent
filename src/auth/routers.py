@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from pydantic import EmailStr
 
-from src.database import Session
+from src.database import get_session
 from src.auth.service import create, get_user_by_email
 from src.auth.models import User
 from src.auth.schemas import Token, UserCreate, UserRead
@@ -15,7 +15,10 @@ router = APIRouter(prefix="/users")
 
 
 @router.post("/login", response_model=Token)
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+def login(
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
+        Session=Depends(get_session)
+    ):
     credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -35,7 +38,7 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
 
 
 @router.post("/create", response_model=UserRead)
-def user_create(user_in: UserCreate):
+def user_create(user_in: UserCreate, Session=Depends(get_session)):
     with Session() as session:
         user = get_user_by_email(db_session=session, email=user_in.email)
         if user:
@@ -48,8 +51,8 @@ def user_create(user_in: UserCreate):
     return {"id": user.id, "email": user.email, "username": user.username, "events": []}
 
 
-@router.get("/get_user", response_model=UserRead)
-def get_user(email: EmailStr):
+@router.get("/get_user/{email}", response_model=UserRead)
+def get_user(email: EmailStr, Session=Depends(get_session)):
     with Session() as session:
         user = get_user_by_email(db_session=session, email=email)
     if not user:
