@@ -28,8 +28,8 @@ class EventFactory(BaseFactory):
     name = FuzzyText()
     user = factory.SubFactory(UserFactory)
     description = FuzzyText()
-    longitude = FuzzyDecimal(low=0, precision=6)
-    latitude = FuzzyDecimal(low=0, precision=6)
+    longitude = FuzzyDecimal(low=-257.343750, high=1555.312500, precision=6)
+    latitude = FuzzyDecimal(low=-88.512518, high=88.398874, precision=6)
 
     class Meta:
         model = Event 

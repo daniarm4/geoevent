@@ -2,12 +2,13 @@ import pytest
 
 from fastapi.testclient import TestClient
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, delete
 
 from tests.database import Session
 from tests.factories import UserFactory, EventFactory
 from src.main import app 
 from src.database import Base, get_session
+from src.event.models import Event
 from src.auth.models import User
 from src.auth.auth import get_hashed_password, get_access_token
 from src.config import TEST_DATABASE_URL
@@ -39,9 +40,20 @@ def db_session(request):
 
     def teardown():
         session.rollback()
+        session.close()
 
     request.addfinalizer(teardown)
     return session
+
+
+@pytest.fixture(autouse=True) 
+def cleanup():
+    user_stmt = delete(User)
+    event_stmt = delete(Event)
+    with Session() as session:
+        session.execute(user_stmt)
+        session.execute(event_stmt)
+        session.commit()
 
 
 @pytest.fixture
@@ -49,7 +61,7 @@ def client():
     return TestClient(app)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def auth_user():
     with Session() as session:
         hashed_password = get_hashed_password('12345678')
@@ -63,7 +75,7 @@ def auth_user():
     return user 
 
 
-@pytest.fixture(scope='session') 
+@pytest.fixture() 
 def token(auth_user):
     access_token = get_access_token(data={'sub': auth_user.email})
     return access_token
@@ -75,10 +87,10 @@ def auth_header(token):
 
 
 @pytest.fixture 
-def user():
-    return UserFactory()
+def user_factory():
+    return UserFactory
 
 
 @pytest.fixture 
-def event():
-    return EventFactory()
+def event_factory():
+    return EventFactory

@@ -1,8 +1,8 @@
 from typing import Optional
 
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from src.database import Session
 from src.auth.models import User
 from src.auth.schemas import UserCreate
 from src.auth.auth import get_hashed_password
@@ -17,7 +17,9 @@ def get(db_session: Session, user_id: int) -> Optional[User]:
     Returns:
         The User object if found, else None.
     """
-    return db_session.get(User, user_id)
+    query = select(User).where(User.id==user_id)
+    user = db_session.execute(query).scalar()
+    return user
 
 
 def get_user_by_email(db_session: Session, email) -> Optional[User]:

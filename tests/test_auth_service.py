@@ -8,17 +8,20 @@ from src.auth.service import (
 from src.auth.schemas import UserCreate
 
 
-def test_get(db_session, user):
+def test_get(db_session, user_factory):
+    user = user_factory()
     db_user = get(db_session=db_session, user_id=user.id)
     assert user.id == db_user.id
 
 
-def test_get_user_by_email(db_session, user):
+def test_get_user_by_email(db_session, user_factory):
+    user = user_factory()
     db_user = get_user_by_email(db_session=db_session, email=user.email)
     assert user.id == db_user.id
 
 
-def test_get_user_by_username(db_session, user):
+def test_get_user_by_username(db_session, user_factory):
+    user = user_factory()
     db_user = get_user_by_username(db_session=db_session, username=user.username)
     assert user.id == db_user.id
 
@@ -32,11 +35,14 @@ def test_create(db_session):
     user = create(db_session=db_session, user_in=user_in)
     db_session.commit()
     assert user
+    created_user = get(db_session=db_session, user_id=user.id)
+    assert created_user
 
 
-def test_delete(db_session, user):
+def test_delete(db_session, user_factory):
+    user = user_factory()
     user_id = user.id
     delete(db_session=db_session, user=user)
     db_session.commit()
     db_user = get(db_session=db_session, user_id=user_id)
-    assert db_user is None
+    assert not db_user

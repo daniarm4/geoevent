@@ -17,7 +17,9 @@ def get(db_session: Session, event_id: int) -> Optional[Event]:
     Returns:
         The Event object if found, else None.
     """
-    return db_session.get(Event, event_id)
+    query = select(Event).where(Event.id==event_id)
+    event = db_session.execute(query).scalar()
+    return event
 
 
 def get_events(db_session: Session) -> Optional[list[Event]]:
@@ -30,7 +32,7 @@ def get_events(db_session: Session) -> Optional[list[Event]]:
         A list of all Event objects.
     """
     query = select(Event)
-    events = db_session.scalars(query)
+    events = db_session.scalars(query).all()
     return events
 
 
@@ -45,7 +47,7 @@ def get_events_by_user(db_session: Session, user_id: int) -> Optional[Event]:
         An Event object if found, else None.
     """
     query = select(Event).where(Event.user_id==user_id)
-    event = db_session.scalars(query)
+    event = db_session.scalars(query).all()
     return event
 
 
