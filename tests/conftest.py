@@ -11,7 +11,8 @@ from src.database import Base, get_session
 from src.event.models import Event
 from src.auth.models import User
 from src.auth.auth import get_hashed_password, get_access_token
-from src.config import TEST_DATABASE_URL
+
+TEST_DATABASE_URL = 'postgresql://postgres:postgres@localhost/test_geoevent_database'
 
 test_engine = create_engine(TEST_DATABASE_URL)
 
