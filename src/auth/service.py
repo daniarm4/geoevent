@@ -1,11 +1,12 @@
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 
 from src.auth.models import User
 from src.auth.schemas import UserCreate
 from src.auth.auth import get_hashed_password
+
 
 def get(db_session: Session, user_id: int) -> Optional[User]:
     """Gets a user by ID.
@@ -43,11 +44,27 @@ def get_user_by_username(db_session: Session, username) -> Optional[User]:
     Args:
         db_session: The database session.
         username: The username of the user to get.
-
+        
     Returns:
         The User object if found, else None.
     """
-    query = select(User).where(User.username==username)
+    query = select(User).where((User.username==username))
+    user = db_session.scalar(query)
+    return user
+
+
+def get_user_by_username_or_email(db_session: Session, username=None, email=None) -> Optional[User]:
+    """Gets a user by username or email.
+
+    Args:
+        db_session: The database session.
+        username: The username of the user to get.
+        email: The email of the user to get.
+        
+    Returns:
+        The User object if found, else None.
+    """
+    query = select(User).where(or_(User.username==username, User.email==email))
     user = db_session.scalar(query)
     return user
 

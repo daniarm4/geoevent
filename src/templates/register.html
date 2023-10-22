@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/auth.css') }}"/>
 </head>
 <body>
-    <form method="post">
-        <input type="text">
-        <input type="password">
-        <button type="submit">Login</button>
-    </form>
+    <div class="container">
+        <h1>Регистрация</h1>
+        <form id='register_form' class="form" method="post" onsubmit="onFormSubmit(event)">
+            <input type="text" placeholder="Email" name="email">
+            <input type="text" placeholder="Username" name="username">
+            <input type="password" placeholder="Password" name="password">
+            <button class="btn">Зарегистрироваться</button>
+        </form>
+        <a class="a" href="{{ url_for('login_form') }}">Уже есть аккаунт</a>
+    </div>
 </body>
+<script src="{{ url_for('static', path='js/register.js') }}"></script>
 </html>

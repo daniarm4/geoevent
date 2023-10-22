@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/auth.css') }}"/>
+</head>
+<body>
+    <div class="container">
+        <h1>Войти</h1>
+        <form class="form" onsubmit="onFormSubmit(event)" id="login_form">
+            <input type="text" placeholder="Email" name="username">
+            <input type="password" placeholder="Password" name="password">
+            <button class="btn">Войти</button>
+        </form>
+        <a class="a" href="{{ url_for('register_form') }}">Еще не зарегистрирован</a>
+    </div>
+</body>
+<script src="{{ url_for('static', path='js/login.js') }}"></script>
+</html>

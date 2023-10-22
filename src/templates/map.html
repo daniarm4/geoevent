@@ -9,34 +9,30 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
-    <style type="text/css">
-      body{
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        width: 100vw;
-        height: 100vh;
-      }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
   </head>
   <body>
-    <div id="map"></div>
-    <script>
-        const map = L.map('map', {
-            center: [-29.50, 400],
-            zoom: 3.5
-        });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
-        function onMapClick(e) {
-            let marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
-            marker.bindPopup("Hello")
-            console.log(e.latlng.lat, e.latlng.lng)
-            console.log(map.getBounds().getSouthWest().wrap())
-        }
-
-        map.on('click', onMapClick);
+    <div class="container">
+      <div class="refs" id="refs">
         
-    </script>
+      </div>
+      <div id="modal" class="modal">
+        <div class="modal-content">
+          <form id="event-form">
+            <div class="modal-content">
+              <label>Название события:</label>
+              <input type="text" id="nameInput" maxlength="30">
+              <input type="text" id="descriptionInput">            
+              <div class="modal-buttons">
+                <button type="button" id="cancelBtn" onclick="closeModal()">Отмена</button>
+                <button type="button" id="addBtn" onclick="addEvent()">Добавить</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
   </body>
+  <script src="{{ url_for('static', path='js/index.js') }}"></script>
 </html>
