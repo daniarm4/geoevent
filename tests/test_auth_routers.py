@@ -10,7 +10,7 @@ def test_create_user(client, db_session):
         'username': 'qwe', 
         'password': '12345678'
     }
-    response = client.post('/users/create', json=user_in)
+    response = client.post('/users/create', data=user_in)
     assert response.status_code == 200
     user_id = response.json()['id']
     user = get(db_session=db_session, user_id=user_id)
@@ -23,12 +23,7 @@ def test_login(client, user_factory):
         'username': user.email,
         'password': '12345678',
     }
-    headers = {'content-type': 'application/x-www-form-urlencoded'}
-    response = client.post(
-                    '/users/login', 
-                    data=data, 
-                    headers=headers
-                )
+    response = client.post('/users/login', data=data)
     assert response.status_code == 200
     access_token = response.json()['access_token']
     assert access_token
@@ -43,6 +38,6 @@ def test_get_user(client, user_factory):
     assert response.json()['id'] == user.id
 
 
-def test_get_me(client, auth_header):
-    response = client.get('/users/me', headers=auth_header)
+def test_check_auth(client, auth_header):
+    response = client.get('/users/check_auth', headers=auth_header)
     assert response.status_code == 200
